@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ORM_MiniApp.Contexts;
+using ORM_MiniApp.Dtos.ProductDtos;
 using ORM_MiniApp.Exceptions;
 using ORM_MiniApp.Models;
 using ORM_MiniApp.Services.Interfaces;
@@ -13,8 +14,17 @@ namespace ORM_MiniApp.Services.Implementations
         {
             _context= new AppDbContext();
         }
-        public async Task AddProductAsync(Product product)
+        public async Task AddProductAsync(ProductPostDto newProduct)
         {
+            Product product = new Product()
+            {
+                Name=newProduct.Name,
+                Price=newProduct.Price,
+                Description=newProduct.Description,
+                Stock=newProduct.Stock,
+                UpdatedAt=DateTime.UtcNow,
+                CreatedAt=DateTime.UtcNow
+            };
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync(); 
         }
@@ -28,24 +38,48 @@ namespace ORM_MiniApp.Services.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Product> GetProductByIdAsync(int id)
+        public async Task<ProductGetDto> GetProductByIdAsync(int id)
         {
             var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
                 throw new NotFoundException($"Can find product with id:{id}");
-            return product;
+            var productDto = new ProductGetDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                Description = product.Description
+            };
+            return productDto;
         }
 
-        public async Task<List<Product>> GetProductsAsync()
+        public async Task<List<ProductGetDto>> GetProductsAsync()
         {
             var products = await _context.Products.AsNoTracking().ToListAsync();
-            return products;
+            var productDtos = products.Select(product => new ProductGetDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                Description = product.Description,
+            }).ToList();
+            return productDtos;
         }
 
-        public async Task<List<Product>> SearchProducts(string name)
+        public async Task<List<ProductGetDto>> SearchProducts(string name)
         {
             var products=await _context.Products.Where(p=>p.Name.Contains(name)).ToListAsync();
-            return products;
+            var productDtos = products.Select(product => new ProductGetDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                Description = product.Description
+            }).ToList();
+            return productDtos;
 
         }
 
