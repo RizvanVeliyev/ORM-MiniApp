@@ -1,7 +1,6 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
 using ORM_MiniApp.Contexts;
 using ORM_MiniApp.Dtos.UserDtos;
 using ORM_MiniApp.Exceptions;
