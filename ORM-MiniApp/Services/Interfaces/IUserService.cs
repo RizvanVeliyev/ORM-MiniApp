@@ -1,9 +1,6 @@
-﻿using ORM_MiniApp.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
+using ORM_MiniApp.Dtos.UserDtos;
+using ORM_MiniApp.Models;
 
 namespace ORM_MiniApp.Services.Interfaces
 {
@@ -11,7 +8,11 @@ namespace ORM_MiniApp.Services.Interfaces
     {
         //        RegisterUser: Yeni istifadəçi qeydiyyatdan keçirmək.Əgər qeydiyyat məlumatları tam deyilsə, InvalidUserInformationException qaytarılmalıdır.  
         //LoginUser: Istifadəçinin sistemi girişi.
-        Task RegisterUser();
+        Task RegisterUser(UserRegDto newUser);
+        Task Login(UserLoginDto user);
+        Task Update(User user);
+        Task<List<Order>> GetUserOrders(int id);
+        Task<IActionResult> ExportUserOrdersToExcel(int userId);
 
         //Əgər istifadəçi adı və ya şifrə yanlışdırsa, UserAuthenticationException qaytarılmalıdır.
         //UpdateUserInfo: Istifadəçi məlumatlarını yeniləmək.
