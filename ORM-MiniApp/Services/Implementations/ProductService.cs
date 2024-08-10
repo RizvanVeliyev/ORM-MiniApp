@@ -30,25 +30,32 @@ namespace ORM_MiniApp.Services.Implementations
 
         public async Task<Product> GetProductByIdAsync(int id)
         {
-            var product = await _context.Products.AsNoTracking().FirstOrDefault(p => p.Id == id);
+            var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
                 throw new NotFoundException($"Can find product with id:{id}");
             return product;
         }
 
-        public Task<List<Product>> GetProductsAsync()
+        public async Task<List<Product>> GetProductsAsync()
         {
-            throw new NotImplementedException();
+            var products = await _context.Products.AsNoTracking().ToListAsync();
+            return products;
         }
 
-        public Task<List<Product>> SearchProducts(string name)
+        public async Task<List<Product>> SearchProducts(string name)
         {
-            throw new NotImplementedException();
+            var products=await _context.Products.Where(p=>p.Name.Contains(name)).ToListAsync();
+            return products;
+
         }
 
-        public Task UpdateProductAsync(Product product)
+        public async Task UpdateProductAsync(Product product)
         {
-            throw new NotImplementedException();
+            var productDb=await _context.Products.AsNoTracking().FirstOrDefaultAsync(p=>p.Id==product.Id);
+            if (product == null)
+                throw new NotFoundException($"Can find product with id:{product.Id}");
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
         }
     }
 }

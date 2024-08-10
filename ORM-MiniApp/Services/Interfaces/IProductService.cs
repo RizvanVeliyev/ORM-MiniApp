@@ -1,4 +1,5 @@
-﻿using ORM_MiniApp.Models;
+﻿using ORM_MiniApp.Dtos.ProductDtos;
+using ORM_MiniApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace ORM_MiniApp.Services.Interfaces
 {
     internal interface IProductService
     {
-        Task AddProductAsync(Product product);
+        Task AddProductAsync(ProductPostDto newProduct);
         Task UpdateProductAsync(Product product);
         Task DeleteProductAsync(int id);
-        Task<List<Product>> GetProductsAsync();
-        Task<Product> GetProductByIdAsync(int id);
-        Task<List<Product>> SearchProducts(string name);
+        Task<List<ProductGetDto>> GetProductsAsync();
+        Task<ProductGetDto> GetProductByIdAsync(int id);
+        Task<List<ProductGetDto>> SearchProducts(string name);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ORM_MiniApp.Configurations;
+using ORM_MiniApp.Dtos.ProductDtos;
 using ORM_MiniApp.Models;
 
 namespace ORM_MiniApp.Contexts
