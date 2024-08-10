@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ORM_MiniApp.Configurations;
 using ORM_MiniApp.Models;
 
 namespace ORM_MiniApp.Contexts
@@ -10,6 +11,12 @@ namespace ORM_MiniApp.Contexts
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrderConfiguration).Assembly);
+            base.OnModelCreating(modelBuilder);
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
