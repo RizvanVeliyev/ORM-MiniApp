@@ -11,7 +11,7 @@ namespace ORM_MiniApp.Services.Interfaces
     internal interface IProductService
     {
         Task AddProductAsync(ProductPostDto newProduct);
-        Task UpdateProductAsync(Product product);
+        Task UpdateProductAsync(ProductGetDto product);
         Task DeleteProductAsync(int id);
         Task<List<ProductGetDto>> GetProductsAsync();
         Task<ProductGetDto> GetProductByIdAsync(int id);

@@ -83,12 +83,21 @@ namespace ORM_MiniApp.Services.Implementations
 
         }
 
-        public async Task UpdateProductAsync(Product product)
+        public async Task UpdateProductAsync(ProductGetDto product)
         {
-            var productDb=await _context.Products.AsNoTracking().FirstOrDefaultAsync(p=>p.Id==product.Id);
-            if (product == null)
+            var productDb = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == product.Id);
+            if (productDb == null)
                 throw new NotFoundException($"Can find product with id:{product.Id}");
-            _context.Products.Update(product);
+            var productDto = new Product()
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Stock = product.Stock,
+                Description = product.Description,
+                UpdatedAt = DateTime.UtcNow
+            };
+            _context.Products.Update(productDto);
             await _context.SaveChangesAsync();
         }
     }
