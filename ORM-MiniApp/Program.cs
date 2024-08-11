@@ -1,7 +1,10 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.EntityFrameworkCore;
+using ORM_MiniApp.Contexts;
 using ORM_MiniApp.Dtos.ProductDtos;
 using ORM_MiniApp.Dtos.UserDtos;
 using ORM_MiniApp.Exceptions;
+using ORM_MiniApp.Models;
 using ORM_MiniApp.Services.Implementations;
 using ORM_MiniApp.Services.Interfaces;
 
@@ -159,45 +162,54 @@ while (true)
                 switch (commandU)
                 {
                     case 1:
-                        UserRegDto user = new UserRegDto();
-                        Console.Write("Enter the User name:");
-                        user.FullName = Console.ReadLine();
-                        Console.Write("Enter Email:");
-                        user.Email = Console.ReadLine();
-                        Console.Write("Enter Password:");
-                        user.Password = Console.ReadLine();
-                        Console.Write("Enter the Adress:");
-                        user.Address = Console.ReadLine();
-                        await userService.RegisterUser(user);
+                        
+                        try
+                        {
+                            UserRegDto user = new UserRegDto();
+                            Console.Write("Enter the User name:");
+                            user.FullName = Console.ReadLine();
+                            Console.Write("Enter Email:");
+                            user.Email = Console.ReadLine();
+                            Console.Write("Enter Password:");
+                            user.Password = Console.ReadLine();
+                            Console.Write("Enter the Adress:");
+                            user.Address = Console.ReadLine();
+                            await userService.RegisterUser(user);
+                        }
+                        catch (InvalidUserInformationException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
                         break;
                     case 2:
                         try
                         {
-                            Console.Write("Enter the Product Id for Update:");
-                            int id = int.Parse(Console.ReadLine());
-                            var productUp = await productService.GetProductByIdAsync(id);
-                            Console.Write("Enter the new product name:");
-                            productUp.Name = Console.ReadLine();
-                            Console.Write("Enter new Price:");
-                            productUp.Price = decimal.Parse(Console.ReadLine());
-                            Console.Write("Enter new Stock Count:");
-                            productUp.Stock = int.Parse(Console.ReadLine());
-                            Console.Write("Enter the new description:");
-                            productUp.Description = Console.ReadLine();
-                            await productService.UpdateProductAsync(productUp);
+                            UserLoginDto userLogin= new UserLoginDto();
+                            Console.Write("Enter the User name:");
+                            userLogin.FullName = Console.ReadLine();
+                            Console.Write("Enter Password:");
+                            userLogin.Password = Console.ReadLine();
+                            await userService.Login(userLogin);
                         }
-                        catch (NotFoundException e)
+                        catch (UserAuthenticationException e)
                         {
                             Console.WriteLine(e.Message);
                         }
                         break;
                     case 3:
-                        List<ProductGetDto> products = await productService.GetProductsAsync();
-                        foreach (var item in products)
-                        {
-                            Console.WriteLine($"Id:{item.Id} Name:{item.Name} Price:{item.Price} " +
-                                $"Stock:{item.Stock} Description:{item.Description}");
-                        }
+                        AppDbContext context= new AppDbContext();
+                        Console.WriteLine("Enter Id for Update:");
+                        int userId=int.Parse(Console.ReadLine());
+                        var userUp = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
+                        Console.Write("Enter the new User name:");
+                        userUp.FullName = Console.ReadLine();
+                        Console.Write("Enter new Email:");
+                        userUp.Email = Console.ReadLine();
+                        Console.Write("Enter new Password:");
+                        userUp.Password = Console.ReadLine();
+                        Console.Write("Enter new Adress:");
+                        userUp.Address = Console.ReadLine();
+                        userService.Update(userUp);
                         break;
                     case 4:
                         try

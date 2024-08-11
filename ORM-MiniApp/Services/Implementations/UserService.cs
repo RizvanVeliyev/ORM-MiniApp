@@ -29,6 +29,7 @@ namespace ORM_MiniApp.Services.Implementations
                 Address = newUser.Address
             };
             await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
 
         }
         public async Task Login(UserLoginDto user)
@@ -60,7 +61,15 @@ namespace ORM_MiniApp.Services.Implementations
             var userUp = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == user.Id);
             if (userUp == null)
                 throw new NotFoundException($"User not found with id:{user.Id}");
-            _context.Users.Update(userUp);
+            var userDto = new User()
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Password = user.Password,
+                Address = user.Address,
+                Email = user.Email
+            };
+            _context.Users.Update(userDto);
             await _context.SaveChangesAsync();
 
         }
