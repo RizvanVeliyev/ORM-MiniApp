@@ -1,9 +1,12 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore;
 using ORM_MiniApp.Contexts;
+using ORM_MiniApp.Dtos.OrderDtos;
 using ORM_MiniApp.Dtos.ProductDtos;
 using ORM_MiniApp.Dtos.UserDtos;
+using ORM_MiniApp.Enums;
 using ORM_MiniApp.Exceptions;
+using ORM_MiniApp.Migrations;
 using ORM_MiniApp.Models;
 using ORM_MiniApp.Services.Implementations;
 using ORM_MiniApp.Services.Interfaces;
@@ -150,7 +153,7 @@ while (true)
             Console.WriteLine("1.Register");
             Console.WriteLine("2.Login");
             Console.WriteLine("3.Update User informations");
-            Console.WriteLine("4.Get Users");
+            Console.WriteLine("4.Get UserOrders");
             Console.WriteLine("5.Export Xml");
             Console.WriteLine("6.Show User Service menu");
             Console.WriteLine("0.Exit User Service");
@@ -197,50 +200,46 @@ while (true)
                         }
                         break;
                     case 3:
-                        AppDbContext context= new AppDbContext();
-                        Console.WriteLine("Enter Id for Update:");
-                        int userId=int.Parse(Console.ReadLine());
-                        var userUp = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
-                        Console.Write("Enter the new User name:");
-                        userUp.FullName = Console.ReadLine();
-                        Console.Write("Enter new Email:");
-                        userUp.Email = Console.ReadLine();
-                        Console.Write("Enter new Password:");
-                        userUp.Password = Console.ReadLine();
-                        Console.Write("Enter new Adress:");
-                        userUp.Address = Console.ReadLine();
-                        userService.Update(userUp);
+                        try
+                        {
+                            AppDbContext context = new AppDbContext();
+                            Console.WriteLine("Enter Id for Update:");
+                            int userId = int.Parse(Console.ReadLine());
+                            var userUp = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
+                            Console.Write("Enter the new User name:");
+                            userUp.FullName = Console.ReadLine();
+                            Console.Write("Enter new Email:");
+                            userUp.Email = Console.ReadLine();
+                            Console.Write("Enter new Password:");
+                            userUp.Password = Console.ReadLine();
+                            Console.Write("Enter new Adress:");
+                            userUp.Address = Console.ReadLine();
+                            userService.Update(userUp);
+                        }
+                        catch (NotFoundException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                        
                         break;
                     case 4:
                         try
                         {
-                            Console.Write("Enter the Product Id:");
-                            int prId = int.Parse(Console.ReadLine());
-
-                            ProductGetDto productGetById = await productService.GetProductByIdAsync(prId);
-                            Console.WriteLine($"Id:{productGetById.Id} Name:{productGetById.Name} Price:{productGetById.Price} " +
-                                    $"Stock:{productGetById.Stock} Description:{productGetById.Description}");
+                            Console.Write("Enter id for User Orders:");
+                            int IdUserOrder = int.Parse(Console.ReadLine());
+                            var userOrders = await userService.GetUserOrders(IdUserOrder);
+                            foreach (var order in userOrders)
+                            {
+                                Console.WriteLine($"User Name:{order.User.FullName} TotalAmount:{order.TotalAmount} Status:{order.Status}");
+                            }
                         }
                         catch (NotFoundException e)
                         {
                             Console.WriteLine(e.Message);
                         }
-
-
                         break;
                     case 5:
-                        try
-                        {
-                            Console.Write("Enter the Product Id:");
-                            int prId = int.Parse(Console.ReadLine());
-
-                            await productService.DeleteProductAsync(prId);
-                            Console.WriteLine("Product Removed!");
-                        }
-                        catch (NotFoundException e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
+                        
                         break;
                     case 6:
                         goto UserMenu;
@@ -250,8 +249,92 @@ while (true)
 
                 }
             }
-            break;
         case 3:
+        OrderMenu:
+            Console.WriteLine("-----------------------------------------------------------------");
+            Console.WriteLine("Welcome to the Order Service");
+            Console.WriteLine("1.Create Order");
+            Console.WriteLine("2.Cancel Order");
+            Console.WriteLine("3.Complete Order");
+            Console.WriteLine("4.Get Orders");
+            Console.WriteLine("5.Add OrderDetail");
+            Console.WriteLine("6.Show Order Service menu");
+            Console.WriteLine("0.Exit Order Service");
+            while (true)
+            {
+                int commandO;
+                Console.Write("Select command:");
+                commandO = int.Parse(Console.ReadLine());
+                switch (commandO)
+                {
+                    case 1:
+
+                        try
+                        {
+                            OrderDto order = new OrderDto();
+                            Console.Write("Enter the User Id:");
+                            order.UserId = int.Parse(Console.ReadLine());
+                            Console.Write("Enter the Total Amount:");
+                            order.TotalAmount = int.Parse(Console.ReadLine());
+                            await orderService.CreateOrder(order);
+                        }
+                        catch (InvalidUserInformationException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                        break;
+                    case 2:
+                        try
+                        {
+                            Console.Write("Enter Order Id for cancel:");
+                            int cancelId=int.Parse(Console.ReadLine());
+                            await orderService.CancelOrder(cancelId);
+                        }
+                        catch (OrderAlreadyCancelledException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                        catch (NotFoundException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                        break;
+                    case 3:
+                        try
+                        {
+                            Console.Write("Enter Order Id for Complete:");
+                            int completeId = int.Parse(Console.ReadLine());
+                            await orderService.CompleteOrder(completeId);
+                        }
+                        catch (OrderAlreadyCompletedException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                        catch (NotFoundException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                        break;
+
+                        
+                    case 4:
+                        var orders = await orderService.GetOrders();
+                        foreach (var order in orders)
+                        {
+                            Console.WriteLine($"Order's User:{order.User.FullName} Total Amount:{order.TotalAmount} Status:{order.Status}");
+                        }
+                        break;
+                    case 5:
+
+                        break;
+                    case 6:
+                        goto OrderMenu;
+                    case 0:
+                        goto Exit;
+
+
+                }
+            }
             break;
         case 4:
             break;

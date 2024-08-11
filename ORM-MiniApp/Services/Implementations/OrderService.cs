@@ -47,10 +47,12 @@ namespace ORM_MiniApp.Services.Implementations
                 throw new NotFoundException($"Cant found order with id:{id}");
             if (order.Status == OrderStatus.Completed)
                 throw new OrderAlreadyCompletedException("Order already Completed!");
+            order.Status = OrderStatus.Completed;
+            await _context.SaveChangesAsync();
         }
         public async Task<List<Order>> GetOrders()
         {
-            var orders=await _context.Orders.ToListAsync();
+            var orders=await _context.Orders.AsNoTracking().Include(o=>o.User).ToListAsync();
             return orders;
         }
         public Task AddOrderDetail(int id)

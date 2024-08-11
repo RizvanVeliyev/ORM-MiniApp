@@ -45,7 +45,7 @@ namespace ORM_MiniApp.Services.Implementations
             var user=await _context.Users.AsNoTracking().FirstOrDefaultAsync(u=>u.Id==id);
             if (user == null)
                 throw new NotFoundException($"User not found with id:{id}");
-            var orders = await _context.Orders.AsNoTracking().Where(o=>o.UserId==id).ToListAsync();
+            var orders = await _context.Orders.AsNoTracking().Where(o=>o.UserId==id).Include(o=>o.User).ToListAsync();
             if (orders.Count == 0)
                 Console.WriteLine("This user Hasn't orders!");
             
