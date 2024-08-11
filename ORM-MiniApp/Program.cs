@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ORM_MiniApp.Contexts;
 using ORM_MiniApp.Dtos.OrderDtos;
+using ORM_MiniApp.Dtos.PaymentDtos;
 using ORM_MiniApp.Dtos.ProductDtos;
 using ORM_MiniApp.Dtos.UserDtos;
 using ORM_MiniApp.Enums;
@@ -11,10 +12,10 @@ using ORM_MiniApp.Models;
 using ORM_MiniApp.Services.Implementations;
 using ORM_MiniApp.Services.Interfaces;
 
-IProductService productService=new ProductService();
-IUserService userService=new UserService();
-IOrderService orderService=new OrderService();
-IPaymentService paymentService=new PaymentService();
+IProductService productService = new ProductService();
+IUserService userService = new UserService();
+IOrderService orderService = new OrderService();
+IPaymentService paymentService = new PaymentService();
 Console.WriteLine("Welcome!");
 Exit:
 Console.WriteLine("-------------------------------------------------------------");
@@ -22,6 +23,8 @@ Console.WriteLine("1.Product Service");
 Console.WriteLine("2.User Service");
 Console.WriteLine("3.Order Service");
 Console.WriteLine("4.Payment Service");
+Console.WriteLine("5.Exit Program");
+
 while (true)
 {
     int command;
@@ -30,7 +33,7 @@ while (true)
     switch (command)
     {
         case 1:
-            ProductMenu:
+        ProductMenu:
             Console.WriteLine("-----------------------------------------------------------------");
             Console.WriteLine("Welcome to the Product Service");
             Console.WriteLine("1.Add Product");
@@ -53,9 +56,9 @@ while (true)
                         Console.Write("Enter the product name:");
                         product.Name = Console.ReadLine();
                         Console.Write("Enter Price:");
-                        product.Price=decimal.Parse(Console.ReadLine());
+                        product.Price = decimal.Parse(Console.ReadLine());
                         Console.Write("Enter Stock Count:");
-                        product.Stock=int.Parse(Console.ReadLine());
+                        product.Stock = int.Parse(Console.ReadLine());
                         Console.Write("Enter the description:");
                         product.Description = Console.ReadLine();
                         await productService.AddProductAsync(product);
@@ -76,13 +79,13 @@ while (true)
                             productUp.Description = Console.ReadLine();
                             await productService.UpdateProductAsync(productUp);
                         }
-                        catch(NotFoundException e)
+                        catch (NotFoundException e)
                         {
                             Console.WriteLine(e.Message);
                         }
                         break;
                     case 3:
-                        List <ProductGetDto> products= await productService.GetProductsAsync();
+                        List<ProductGetDto> products = await productService.GetProductsAsync();
                         foreach (var item in products)
                         {
                             Console.WriteLine($"Id:{item.Id} Name:{item.Name} Price:{item.Price} " +
@@ -104,7 +107,7 @@ while (true)
                             Console.WriteLine(e.Message);
                         }
 
-                        
+
                         break;
                     case 5:
                         try
@@ -112,7 +115,7 @@ while (true)
                             Console.Write("Enter the Product Id:");
                             int prId = int.Parse(Console.ReadLine());
 
-                            await productService.DeleteProductAsync (prId);
+                            await productService.DeleteProductAsync(prId);
                             Console.WriteLine("Product Removed!");
                         }
                         catch (NotFoundException e)
@@ -121,7 +124,7 @@ while (true)
                         }
                         break;
                     case 6:
-                       
+
                         try
                         {
                             Console.WriteLine("Enter the name which do you seacrh:");
@@ -143,7 +146,9 @@ while (true)
                         goto ProductMenu;
                     case 0:
                         goto Exit;
-                        
+                    default:
+                        goto ProductMenu;
+
                 }
             }
         case 2:
@@ -165,7 +170,7 @@ while (true)
                 switch (commandU)
                 {
                     case 1:
-                        
+
                         try
                         {
                             UserRegDto user = new UserRegDto();
@@ -187,7 +192,7 @@ while (true)
                     case 2:
                         try
                         {
-                            UserLoginDto userLogin= new UserLoginDto();
+                            UserLoginDto userLogin = new UserLoginDto();
                             Console.Write("Enter the User name:");
                             userLogin.FullName = Console.ReadLine();
                             Console.Write("Enter Password:");
@@ -220,7 +225,7 @@ while (true)
                         {
                             Console.WriteLine(e.Message);
                         }
-                        
+
                         break;
                     case 4:
                         try
@@ -239,12 +244,14 @@ while (true)
                         }
                         break;
                     case 5:
-                        
+
                         break;
                     case 6:
                         goto UserMenu;
                     case 0:
                         goto Exit;
+                    default:
+                        goto UserMenu;
 
 
                 }
@@ -287,7 +294,7 @@ while (true)
                         try
                         {
                             Console.Write("Enter Order Id for cancel:");
-                            int cancelId=int.Parse(Console.ReadLine());
+                            int cancelId = int.Parse(Console.ReadLine());
                             await orderService.CancelOrder(cancelId);
                         }
                         catch (OrderAlreadyCancelledException e)
@@ -316,7 +323,7 @@ while (true)
                         }
                         break;
 
-                        
+
                     case 4:
                         var orders = await orderService.GetOrders();
                         foreach (var order in orders)
@@ -331,17 +338,60 @@ while (true)
                         goto OrderMenu;
                     case 0:
                         goto Exit;
+                    default:
+                        goto OrderMenu;
 
 
                 }
             }
-            break;
         case 4:
-            break;
-        case 5:
-            break;
+        PaymentMenu:
+            Console.WriteLine("-----------------------------------------------------------------");
+            Console.WriteLine("Welcome to the Payment Service");
+            Console.WriteLine("1.Make Payment");
+            Console.WriteLine("2.Get All Payments");
+            Console.WriteLine("3.Show Payment Service menu");
+            Console.WriteLine("0.Exit Order Service");
+            while (true)
+            {
+                int commandPy;
+                Console.Write("Select command:");
+                commandPy = int.Parse(Console.ReadLine());
+                switch (commandPy)
+                {
+                    case 1:
+                        PaymentDto payment = new PaymentDto();
+                        Console.Write("Enter the Order Id:");
+                        payment.OrderId = int.Parse(Console.ReadLine());
+                        Console.Write("Enter the Total Amount:");
+                        payment.Amount = decimal.Parse(Console.ReadLine());
+                        await paymentService.MakePayment(payment);
+
+                        break;
+                    case 2:
+                        var payments = await paymentService.GetAllPayment();
+                        foreach (var p in payments)
+                        {
+                            Console.WriteLine($"Payment Amouunt{p.Amount} Order Id:{p.OrderId}");
+                        }
+                        break;
+                    case 3:
+                        goto PaymentMenu;
+                    case 0:
+                        goto Exit;
+                    default:
+                        goto PaymentMenu;
+
+
+                }
+            }
+
+        case 0:
+            Console.WriteLine("Program Finished!");
+            return;
         default:
-            break;
+            goto Exit;
     }
+
 
 }

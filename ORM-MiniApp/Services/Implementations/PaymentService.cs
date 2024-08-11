@@ -15,7 +15,7 @@ namespace ORM_MiniApp.Services.Implementations
         }
         public async Task<List<PaymentDto>> GetAllPayment()
         {
-            var payments = await _context.Payments.AsNoTracking().ToListAsync();
+            var payments = await _context.Payments.AsNoTracking().Include(p=>p.Order).ThenInclude(o=>o.User).ToListAsync();
             var paymentDtos = payments.Select(payment => new PaymentDto()
             {
                 OrderId=payment.OrderId,
