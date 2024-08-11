@@ -28,6 +28,13 @@ namespace ORM_MiniApp.Services.Implementations
                 Password = newUser.Password,
                 Address = newUser.Address
             };
+            var users = await _context.Users.ToListAsync();
+            foreach (var item in users)
+            {
+                if (item.Email == user.Email)
+                    throw new SameEmailException("This email already exist!");
+            }
+            
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
@@ -37,6 +44,8 @@ namespace ORM_MiniApp.Services.Implementations
             var userDto = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u=>u.FullName== user.FullName && u.Password==user.Password);
             if (userDto == null)
                 throw new UserAuthenticationException("Fullname or Password is wrong!");
+            Console.WriteLine("You Login Successfully!");
+
         }
 
         public async Task<List<Order>> GetUserOrders(int id)

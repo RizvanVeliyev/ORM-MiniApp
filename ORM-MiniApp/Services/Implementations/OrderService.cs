@@ -38,7 +38,16 @@ namespace ORM_MiniApp.Services.Implementations
                 throw new NotFoundException($"Cant found order with id:{id}");
             if (order.Status == OrderStatus.Cancelled)
                 throw new OrderAlreadyCancelledException("Order already cancelled!");
-            order.Status = OrderStatus.Cancelled;
+            if (order.Status != OrderStatus.Completed)
+            {
+                order.Status = OrderStatus.Cancelled;
+                Console.WriteLine("Order cancelled!");
+                _context.Orders.Remove(order);
+            }
+                
+            else Console.WriteLine("Can't cancel completed order!");
+            
+
             await _context.SaveChangesAsync();
         }
         public async Task CompleteOrder(int id)

@@ -29,9 +29,8 @@ UserMenu:
     Console.WriteLine("0.Finish Program");
     while (true)
     {
-        int commandU;
-        Console.Write("Select command:");
-        commandU = int.Parse(Console.ReadLine());
+        int commandU = InputPositiveInt("Select Command:");
+
         switch (commandU)
         {
             case 1:
@@ -50,6 +49,10 @@ UserMenu:
                     await userService.RegisterUser(user);
                 }
                 catch (InvalidUserInformationException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                catch(SameEmailException e)
                 {
                     Console.WriteLine(e.Message);
                 }
@@ -74,8 +77,7 @@ UserMenu:
                 try
                 {
                     AppDbContext context = new AppDbContext();
-                    Console.WriteLine("Enter Id for Update:");
-                    int userId = int.Parse(Console.ReadLine());
+                    int userId = InputPositiveInt("Enter Id for Update:");
                     var userUp = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
                     Console.Write("Enter the new User name:");
                     userUp.FullName = Console.ReadLine();
@@ -96,8 +98,7 @@ UserMenu:
             case 4:
                 try
                 {
-                    Console.Write("Enter id for User Orders:");
-                    int IdUserOrder = int.Parse(Console.ReadLine());
+                    int IdUserOrder = InputPositiveInt("Enter Id for User Orders:");
                     var userOrders = await userService.GetUserOrders(IdUserOrder);
                     foreach (var order in userOrders)
                     {
@@ -123,8 +124,8 @@ UserMenu:
 
         }
     }
-    ServicesMenu:
-    Console.WriteLine("You Login Successfully!");
+ServicesMenu:
+
     Console.WriteLine("-------------------------------------------------------------");
     Console.WriteLine("1.Product Service");
     Console.WriteLine("2.Order Service");
@@ -134,9 +135,8 @@ UserMenu:
 
     while (true)
     {
-        int command;
-        Console.Write("Select Service:");
-        command = int.Parse(Console.ReadLine());
+        int command = InputPositiveInt("Select Service:");
+
         switch (command)
         {
             case 1:
@@ -153,19 +153,16 @@ UserMenu:
                 Console.WriteLine("0.Exit Porduct Service");
                 while (true)
                 {
-                    int commandP;
-                    Console.Write("Select command:");
-                    commandP = int.Parse(Console.ReadLine());
+                    int commandP = InputPositiveInt("Select command:");
+
                     switch (commandP)
                     {
                         case 1:
                             ProductPostDto product = new ProductPostDto();
                             Console.Write("Enter the product name:");
                             product.Name = Console.ReadLine();
-                            Console.Write("Enter Price:");
-                            product.Price = decimal.Parse(Console.ReadLine());
-                            Console.Write("Enter Stock Count:");
-                            product.Stock = int.Parse(Console.ReadLine());
+                            product.Price = InputDecimalPositive("Enter Price:");
+                            product.Stock = InputPositiveInt("Enter Stock Count:");
                             Console.Write("Enter the description:");
                             product.Description = Console.ReadLine();
                             await productService.AddProductAsync(product);
@@ -173,15 +170,12 @@ UserMenu:
                         case 2:
                             try
                             {
-                                Console.Write("Enter the Product Id for Update:");
-                                int id = int.Parse(Console.ReadLine());
+                                int id = InputPositiveInt("Enter the Product Id for Update:");
                                 var productUp = await productService.GetProductByIdAsync(id);
                                 Console.Write("Enter the new product name:");
                                 productUp.Name = Console.ReadLine();
-                                Console.Write("Enter new Price:");
-                                productUp.Price = decimal.Parse(Console.ReadLine());
-                                Console.Write("Enter new Stock Count:");
-                                productUp.Stock = int.Parse(Console.ReadLine());
+                                productUp.Price = InputDecimalPositive("Enter new Price:");
+                                productUp.Stock = InputPositiveInt("Enter new Stock Count:");
                                 Console.Write("Enter the new description:");
                                 productUp.Description = Console.ReadLine();
                                 await productService.UpdateProductAsync(productUp);
@@ -202,8 +196,7 @@ UserMenu:
                         case 4:
                             try
                             {
-                                Console.Write("Enter the Product Id:");
-                                int prId = int.Parse(Console.ReadLine());
+                                int prId = InputPositiveInt("Enter the Product Id:");
 
                                 ProductGetDto productGetById = await productService.GetProductByIdAsync(prId);
                                 Console.WriteLine($"Id:{productGetById.Id} Name:{productGetById.Name} Price:{productGetById.Price} " +
@@ -219,8 +212,7 @@ UserMenu:
                         case 5:
                             try
                             {
-                                Console.Write("Enter the Product Id:");
-                                int prId = int.Parse(Console.ReadLine());
+                                int prId = InputPositiveInt("Enter the Product Id:");
 
                                 await productService.DeleteProductAsync(prId);
                                 Console.WriteLine("Product Removed!");
@@ -272,9 +264,7 @@ UserMenu:
                 Console.WriteLine("0.Exit Order Service");
                 while (true)
                 {
-                    int commandO;
-                    Console.Write("Select command:");
-                    commandO = int.Parse(Console.ReadLine());
+                    int commandO = InputPositiveInt("Select command:");
                     switch (commandO)
                     {
                         case 1:
@@ -282,10 +272,8 @@ UserMenu:
                             try
                             {
                                 OrderDto order = new OrderDto();
-                                Console.Write("Enter the User Id:");
-                                order.UserId = int.Parse(Console.ReadLine());
-                                Console.Write("Enter the Total Amount:");
-                                order.TotalAmount = int.Parse(Console.ReadLine());
+                                order.UserId = InputPositiveInt("Enter the User Id:");
+                                order.TotalAmount = InputDecimalPositive("Enter the Total Amount:");
                                 await orderService.CreateOrder(order);
                             }
                             catch (InvalidUserInformationException e)
@@ -296,8 +284,7 @@ UserMenu:
                         case 2:
                             try
                             {
-                                Console.Write("Enter Order Id for cancel:");
-                                int cancelId = int.Parse(Console.ReadLine());
+                                int cancelId = InputPositiveInt("Enter Order Id for cancel:");
                                 await orderService.CancelOrder(cancelId);
                             }
                             catch (OrderAlreadyCancelledException e)
@@ -312,8 +299,7 @@ UserMenu:
                         case 3:
                             try
                             {
-                                Console.Write("Enter Order Id for Complete:");
-                                int completeId = int.Parse(Console.ReadLine());
+                                int completeId = InputPositiveInt("Enter Order Id for Complete:");
                                 await orderService.CompleteOrder(completeId);
                             }
                             catch (OrderAlreadyCompletedException e)
@@ -331,7 +317,7 @@ UserMenu:
                             var orders = await orderService.GetOrders();
                             foreach (var order in orders)
                             {
-                                Console.WriteLine($"Order's User:{order.User.FullName} Total Amount:{order.TotalAmount} Status:{order.Status}");
+                                Console.WriteLine($"Order id:{order.Id}  Order's User:{order.User.FullName} Total Amount:{order.TotalAmount} Status:{order.Status}");
                             }
                             break;
                         case 5:
@@ -357,17 +343,13 @@ UserMenu:
                 Console.WriteLine("0.Exit Order Service");
                 while (true)
                 {
-                    int commandPy;
-                    Console.Write("Select command:");
-                    commandPy = int.Parse(Console.ReadLine());
+                    int commandPy = InputPositiveInt("Select command:");
                     switch (commandPy)
                     {
                         case 1:
                             PaymentDto payment = new PaymentDto();
-                            Console.Write("Enter the Order Id:");
-                            payment.OrderId = int.Parse(Console.ReadLine());
-                            Console.Write("Enter the Total Amount:");
-                            payment.Amount = decimal.Parse(Console.ReadLine());
+                            payment.OrderId = InputPositiveInt("Enter the Order Id:");
+                            payment.Amount = InputDecimalPositive("Enter the Total Amount:");
                             await paymentService.MakePayment(payment);
 
                             break;
@@ -397,4 +379,29 @@ UserMenu:
         }
 
     }
+}
+
+static int InputPositiveInt(string prompt)
+{
+    int result;
+    Console.Write(prompt);
+
+    while (!int.TryParse(Console.ReadLine(), out result) || result < 0)
+    {
+        Console.WriteLine("Invalid input. Please enter a positive integer.");
+        Console.Write(prompt);
+    }
+
+    return result;
+}
+static decimal InputDecimalPositive(string prompt)
+{
+    decimal result;
+    Console.Write(prompt);
+    while (!decimal.TryParse(Console.ReadLine(), out result) || result <= 0)
+    {
+        Console.WriteLine("Invalid input. Please enter a positive decimal.");
+        Console.Write(prompt);
+    }
+    return result;
 }
