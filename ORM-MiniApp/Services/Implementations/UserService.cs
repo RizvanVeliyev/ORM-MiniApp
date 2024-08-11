@@ -37,7 +37,6 @@ namespace ORM_MiniApp.Services.Implementations
             var userDto = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u=>u.FullName== user.FullName && u.Password==user.Password);
             if (userDto == null)
                 throw new UserAuthenticationException("Fullname or Password is wrong!");
-            Console.WriteLine("Login successful!");
         }
 
         public async Task<List<Order>> GetUserOrders(int id)
