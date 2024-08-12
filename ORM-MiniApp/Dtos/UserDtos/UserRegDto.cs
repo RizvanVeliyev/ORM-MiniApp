@@ -7,6 +7,7 @@ namespace ORM_MiniApp.Dtos.UserDtos
         private string _fullName;
         private string _password;
         private string _email;
+        private string _firstName;
         public string FullName
         {
             get => _fullName;
@@ -20,7 +21,7 @@ namespace ORM_MiniApp.Dtos.UserDtos
                     Console.WriteLine("FullName must be between 5 and 20 characters long and cannot consist only of spaces. Enter again:");
                     value = Console.ReadLine().Trim();
                 }
-
+                 
                 _fullName = value;
             }
         }
