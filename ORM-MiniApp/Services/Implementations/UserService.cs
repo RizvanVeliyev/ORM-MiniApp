@@ -20,7 +20,7 @@ namespace ORM_MiniApp.Services.Implementations
         {
             if (string.IsNullOrEmpty(newUser.Email) || string.IsNullOrEmpty(newUser.Password) ||
                 string.IsNullOrEmpty(newUser.FullName) || string.IsNullOrEmpty(newUser.Address))
-                throw new InvalidUserInformationException("All information should entered for register!");
+                throw new InvalidUserInformationException("All information should be entered for register!");
             var user = new User()
             {
                 FullName = newUser.FullName,
