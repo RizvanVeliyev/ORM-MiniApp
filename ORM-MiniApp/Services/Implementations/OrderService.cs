@@ -5,6 +5,7 @@ using ORM_MiniApp.Enums;
 using ORM_MiniApp.Exceptions;
 using ORM_MiniApp.Models;
 using ORM_MiniApp.Services.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace ORM_MiniApp.Services.Implementations
@@ -65,9 +66,18 @@ namespace ORM_MiniApp.Services.Implementations
             var orders=await _context.Orders.AsNoTracking().Include(o=>o.User).ToListAsync();
             return orders;
         }
-        public Task AddOrderDetail(int id)
+        public async Task AddOrderDetail(OrderDetail Od)
         {
-            throw new NotImplementedException();
+            var order = await _context.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == Od.OrderId);
+            if (order == null)
+                throw new NotFoundException($"Cant find order with id:{Od.OrderId}");
+            var product = await _context.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == Od.ProductId);
+            if (product == null)
+                throw new NotFoundException($"Cant find order with id:{Od.ProductId}");
+            if (Od.Quantity <=0 || Od.PricePerItem <= 0)
+                throw new InvalidOrderDetailException("Quantity and PricePerItem must be greater than 0!");
+            await _context.OrderDetails.AddAsync(orderDetail);
+            await _context.SaveChangesAsync();
         }
 
     }

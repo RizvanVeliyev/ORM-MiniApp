@@ -5,6 +5,7 @@ using ORM_MiniApp.Dtos.PaymentDtos;
 using ORM_MiniApp.Dtos.ProductDtos;
 using ORM_MiniApp.Dtos.UserDtos;
 using ORM_MiniApp.Exceptions;
+using ORM_MiniApp.Models;
 using ORM_MiniApp.Services.Implementations;
 using ORM_MiniApp.Services.Interfaces;
 
@@ -321,6 +322,26 @@ ServicesMenu:
                             }
                             break;
                         case 5:
+                            try
+                            {
+                                OrderDetail Od = new OrderDetail();
+                                Od.OrderId = InputPositiveInt("Enter the order Id:");
+                                Od.ProductId = InputPositiveInt("Enter the product Id:");
+                                Od.Quantity = InputPositiveInt("Enter the quantity");
+                                Od.PricePerItem = InputDecimalPositive("Enter price for per item:");
+                                await orderService.AddOrderDetail(Od);
+                            }
+                            catch(InvalidOrderDetailException e)
+                            {
+                                Console.WriteLine(e.Message);
+                            }
+                            catch (NotFoundException e)
+                            {
+                                Console.WriteLine(e.Message);
+                            }
+
+
+
 
                             break;
                         case 6:
