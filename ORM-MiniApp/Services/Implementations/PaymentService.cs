@@ -2,20 +2,23 @@
 using ORM_MiniApp.Contexts;
 using ORM_MiniApp.Dtos.PaymentDtos;
 using ORM_MiniApp.Models;
+using ORM_MiniApp.Repositories.Implementations;
+using ORM_MiniApp.Repositories.Interfaces;
 using ORM_MiniApp.Services.Interfaces;
 
 namespace ORM_MiniApp.Services.Implementations
 {
     internal class PaymentService : IPaymentService
     {
-        private readonly AppDbContext _context;
+        
+        private readonly IPaymentRepository _paymentRepository;
         public PaymentService()
         {
-            _context = new AppDbContext();
+            _paymentRepository =new PaymentRepository();
         }
         public async Task<List<PaymentDto>> GetAllPayment()
         {
-            var payments = await _context.Payments.AsNoTracking().Include(p=>p.Order).ThenInclude(o=>o.User).ToListAsync();
+            var payments = await _paymentRepository.GetAllAsync("Order.OrderDetails.Product");
             var paymentDtos = payments.Select(payment => new PaymentDto()
             {
                 OrderId=payment.OrderId,
@@ -33,8 +36,8 @@ namespace ORM_MiniApp.Services.Implementations
                 Amount = payment.Amount,
                 PaymentDate = DateTime.UtcNow
             };
-            await _context.Payments.AddAsync(paymentDto);
-            await _context.SaveChangesAsync();
+            await _paymentRepository.CreateAsync(paymentDto);
+            await _paymentRepository.SaveChangesAsync();
         }
     }
 }

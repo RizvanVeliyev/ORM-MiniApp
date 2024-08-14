@@ -3,7 +3,7 @@ using ORM_MiniApp.Models.Common;
 
 namespace ORM_MiniApp.Models
 {
-    internal class Order : BaseEntity
+    public class Order : BaseEntity
     {
 
         public int UserId { get; set; }
@@ -11,6 +11,6 @@ namespace ORM_MiniApp.Models
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
         public OrderStatus  Status { get; set; }
-
+        public List<OrderDetail> OrderDetails { get; set; }
     }
 }

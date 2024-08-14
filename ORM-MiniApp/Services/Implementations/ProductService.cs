@@ -3,19 +3,24 @@ using ORM_MiniApp.Contexts;
 using ORM_MiniApp.Dtos.ProductDtos;
 using ORM_MiniApp.Exceptions;
 using ORM_MiniApp.Models;
+using ORM_MiniApp.Repositories.Implementations;
+using ORM_MiniApp.Repositories.Interfaces;
 using ORM_MiniApp.Services.Interfaces;
 
 namespace ORM_MiniApp.Services.Implementations
 {
     internal class ProductService : IProductService
     {
-        private readonly AppDbContext _context;
+        private readonly IProductRepository _productRepository;
+
         public ProductService()
         {
-            _context= new AppDbContext();
+            _productRepository = new ProductRepository();
         }
+        
         public async Task AddProductAsync(ProductPostDto newProduct)
         {
+           
             Product product = new Product()
             {
                 Name=newProduct.Name,
@@ -25,22 +30,24 @@ namespace ORM_MiniApp.Services.Implementations
                 UpdatedAt=DateTime.UtcNow,
                 CreatedAt=DateTime.UtcNow
             };
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync(); 
+            await _productRepository.CreateAsync(product);
+            await _productRepository.SaveChangesAsync();
         }
 
         public async Task DeleteProductAsync(int id)
         {
-            var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+            
+            var product = await _productRepository.GetSingleAsync(p => p.Id == id);
             if (product == null)
                 throw new NotFoundException($"Can find product with id:{id}");
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            _productRepository.Delete(product);
+            await _productRepository.SaveChangesAsync();
         }
 
         public async Task<ProductGetDto> GetProductByIdAsync(int id)
         {
-            var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+            
+            var product = await _productRepository.GetSingleAsync(p => p.Id == id); 
             if (product == null)
                 throw new NotFoundException($"Can find product with id:{id}");
             var productDto = new ProductGetDto
@@ -56,7 +63,9 @@ namespace ORM_MiniApp.Services.Implementations
 
         public async Task<List<ProductGetDto>> GetProductsAsync()
         {
-            var products = await _context.Products.AsNoTracking().ToListAsync();
+            
+            var products = await _productRepository.GetAllAsync();
+
             var productDtos = products.Select(product => new ProductGetDto
             {
                 Id = product.Id,
@@ -70,6 +79,7 @@ namespace ORM_MiniApp.Services.Implementations
 
         public async Task<List<ProductGetDto>> SearchProducts(string name)
         {
+            AppDbContext _context = new AppDbContext();
             var products=await _context.Products.Where(p=>p.Name.Contains(name)).ToListAsync();
             var productDtos = products.Select(product => new ProductGetDto
             {
@@ -85,7 +95,7 @@ namespace ORM_MiniApp.Services.Implementations
 
         public async Task UpdateProductAsync(ProductGetDto product)
         {
-            var productDb = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == product.Id);
+            var productDb = await _productRepository.GetSingleAsync(p => p.Id == product.Id);
             if (productDb == null)
                 throw new NotFoundException($"Can find product with id:{product.Id}");
             var productDto = new Product()
@@ -97,8 +107,8 @@ namespace ORM_MiniApp.Services.Implementations
                 Description = product.Description,
                 UpdatedAt = DateTime.UtcNow
             };
-            _context.Products.Update(productDto);
-            await _context.SaveChangesAsync();
+            _productRepository.Update(productDto);
+            await _productRepository.SaveChangesAsync();
         }
     }
 }

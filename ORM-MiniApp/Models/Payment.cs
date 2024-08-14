@@ -2,7 +2,7 @@
 
 namespace ORM_MiniApp.Models
 {
-    internal class Payment : BaseEntity
+    public class Payment : BaseEntity
     {
      
 

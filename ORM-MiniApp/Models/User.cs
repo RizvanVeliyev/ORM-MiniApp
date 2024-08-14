@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace ORM_MiniApp.Models
 {
-    internal class User : BaseEntity
+    public class User : BaseEntity
     {
 
         private string _fullName;

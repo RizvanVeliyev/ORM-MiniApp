@@ -2,7 +2,7 @@
 
 namespace ORM_MiniApp.Models
 {
-    internal class OrderDetail : BaseEntity
+    public class OrderDetail : BaseEntity
     {
 
         public int OrderId { get; set; }
